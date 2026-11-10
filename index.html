@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sort It Out! Game</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #fff8e8;
+    margin: 0;
+    color: #283344;
+}
+
+header {
+    background: #d92368;
+    color: white;
+    padding: 20px;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+main {
+    padding: 20px;
+}
+
+.instructions {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.category {
+    background: white;
+    border: 5px solid #283344;
+    border-radius: 20px;
+    min-height: 300px;
+    overflow: hidden;
+}
+
+.category h2 {
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 15px;
+}
+
+.school h2 { background: #2878b8; }
+.home h2 { background: #198052; }
+.both h2 { background: #7040d2; }
+
+.dropzone {
+    min-height: 240px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    align-content: start;
+}
+
+.dropzone.over {
+    background: #dcecff;
+}
+
+h3 {
+    margin-top: 30px;
+    font-size: 25px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.card {
+    background: white;
+    border: 2px dashed #8792a5;
+    border-radius: 12px;
+    padding: 15px 5px;
+    text-align: center;
+    font-size: 42px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.card span {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card.selected {
+    outline: 4px solid orange;
+}
+
+button {
+    padding: 12px 20px;
+    margin: 15px 5px;
+    border: none;
+    background: #283344;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#status {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+@media(max-width:700px) {
+    .categories {
+        grid-template-columns: 1fr;
+    }
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>Sort It Out!</header>
+
+<main>
+
+<p class="instructions">
+Look at each picture. Drag the 20 cards into the correct box:
+School, Home, or Both.
+</p>
+
+<div class="categories">
+
+    <div class="category school">
+        <h2>School</h2>
+        <div class="dropzone"></div>
+    </div>
+
+    <div class="category home">
+        <h2>Home</h2>
+        <div class="dropzone"></div>
+    </div>
+
+    <div class="category both">
+        <h2>Both</h2>
+        <div class="dropzone"></div>
+    </div>
+
+</div>
+
+<h3>Cards to Sort</h3>
+
+<div class="cards" id="cards">
+
+    <div class="card" draggable="true">🖨️<span>1. Printer</span></div>
+    <div class="card" draggable="true">🖥️<span>2. Monitor</span></div>
+    <div class="card" draggable="true">📺<span>3. Television</span></div>
+    <div class="card" draggable="true">🎮<span>4. Game Controller</span></div>
+
+    <div class="card" draggable="true">💻<span>5. Laptop</span></div>
+    <div class="card" draggable="true">📱<span>6. Smartphone</span></div>
+    <div class="card" draggable="true">🖼️<span>7. Digital Photo Frame</span></div>
+    <div class="card" draggable="true">⌚<span>8. Smartwatch</span></div>
+
+    <div class="card" draggable="true">📷<span>9. Camera</span></div>
+    <div class="card" draggable="true">🎧<span>10. Headphones</span></div>
+    <div class="card" draggable="true">⌨️<span>11. Keyboard</span></div>
+    <div class="card" draggable="true">🖱️<span>12. Mouse</span></div>
+
+    <div class="card" draggable="true">🔊<span>13. Speaker</span></div>
+    <div class="card" draggable="true">📽️<span>14. Projector</span></div>
+    <div class="card" draggable="true">📊<span>15. Interactive Board</span></div>
+    <div class="card" draggable="true">📡<span>16. Router</span></div>
+
+    <div class="card" draggable="true">📠<span>17. Scanner</span></div>
+    <div class="card" draggable="true">📖<span>18. E-reader</span></div>
+    <div class="card" draggable="true">🎤<span>19. Microphone</span></div>
+    <div class="card" draggable="true">📹<span>20. Webcam</span></div>
+
+</div>
+
+<button onclick="resetGame()">Reset Game</button>
+<button onclick="checkProgress()">Check Progress</button>
+
+<p id="status">0 of 20 cards sorted.</p>
+
+</main>
+
+<script>
+
+let selectedCard = null;
+let draggedCard = null;
+
+const cards = document.querySelectorAll(".card");
+const dropzones = document.querySelectorAll(".dropzone");
+
+cards.forEach(card => {
+
+    // Desktop drag and drop
+    card.addEventListener("dragstart", function(e) {
+        draggedCard = this;
+        e.dataTransfer.setData("text/plain", "card");
+    });
+
+    card.addEventListener("dragend", function() {
+        draggedCard = null;
+    });
+
+    // Touchscreen and click selection
+    card.addEventListener("click", function() {
+        if (selectedCard) {
+            selectedCard.classList.remove("selected");
+        }
+
+        if (selectedCard === this) {
+            selectedCard = null;
+        } else {
+            selectedCard = this;
+            this.classList.add("selected");
+        }
+    });
+
+    // Pointer dragging for touchscreen
+    card.addEventListener("pointerdown", function(e) {
+        if (e.pointerType === "mouse") return;
+
+        draggedCard = this;
+        this.setPointerCapture(e.pointerId);
+    });
+
+    card.addEventListener("pointerup", function(e) {
+        if (e.pointerType === "mouse" || !draggedCard) return;
+
+        const target = document.elementFromPoint(
+            e.clientX, e.clientY
+        );
+
+        const zone = target?.closest(".dropzone");
+
+        if (zone) {
+            zone.appendChild(this);
+            selectedCard = null;
+            updateProgress();
+        }
+
+        draggedCard = null;
+    });
+
+});
+
+// Allow cards to enter the boxes
+dropzones.forEach(zone => {
+
+    zone.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        this.classList.add("over");
+    });
+
+    zone.addEventListener("dragleave", function() {
+        this.classList.remove("over");
+    });
+
+    zone.addEventListener("drop", function(e) {
+        e.preventDefault();
+
+        if (draggedCard) {
+            this.appendChild(draggedCard);
+            draggedCard = null;
+            updateProgress();
+        }
+
+        this.classList.remove("over");
+    });
+
+    // Touchscreen: tap the selected card's destination
+    zone.addEventListener("click", function(e) {
+        if (e.target.closest(".card")) return;
+
+        if (selectedCard) {
+            this.appendChild(selectedCard);
+            selectedCard.classList.remove("selected");
+            selectedCard = null;
+            updateProgress();
+        }
+    });
+
+});
+
+function updateProgress() {
+    let sorted = document.querySelectorAll(
+        ".dropzone .card"
+    ).length;
+
+    document.getElementById("status").innerText =
+        sorted + " of 20 cards sorted.";
+}
+
+function checkProgress() {
+    let sorted = document.querySelectorAll(
+        ".dropzone .card"
+    ).length;
+
+    if (sorted === 20) {
+        alert("Excellent! You sorted all 20 cards!");
+    } else {
+        alert("You have sorted " + sorted +
+        " out of 20 cards. Keep going!");
+    }
+}
+
+function resetGame() {
+    const cardContainer = document.getElementById("cards");
+
+    cards.forEach(card => {
+        cardContainer.appendChild(card);
+        card.classList.remove("selected");
+    });
+
+    selectedCard = null;
+    draggedCard = null;
+    updateProgress();
+}
+
+</script>
+
+</body>
+</html>
